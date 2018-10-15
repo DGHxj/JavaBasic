@@ -1,0 +1,186 @@
+一、IO流
+	InputOutputStream - 输入输出流，可以利用输入输出流向程序中写入写出数据。其中传输的是数据的流。
+	按照数据流流动的方向，流分为输入流 和 输出流。流的方向由程序的角度来思考，将数据写入程序的流称之为输入流，从程序中写出数据的流，称之为输出流。
+	按照数据流中传输的内容，流分为 字节流 和 字符流。
+
+	按照两个维度，相乘，就得到了四大基本流：
+		--------------------------------------
+					输入流			输出流
+			字节流	字节输入流InputStream	字节输出流OutputStream
+			字符流	字符输入流Reader		字符输出流Writer
+		--------------------------------------
+	这四大基本流是流的继承结构的根，都是抽象类，无法直接使用，一般用的都是他们的具有具体功能的子孙类。
+
+二、字符流
+	1.字符输入流Reader - FileReader
+		构造方法：
+			FileReader(File file) 
+			FileReader(String fileName) 
+		读取数据的方法：
+			int read() 
+			int read(char[] cbuf)
+		关闭流：
+			close()
+	2.字符输出流Writer - FileWriter
+		构造方法：
+			FileWriter(File file) 
+			FileWriter(String fileName) 
+		输出数据的方法：
+			void write(int c)
+			write(char[] cbuf)
+		刷新流：
+			flush()
+		关闭流：
+			close()
+
+		案例：利用字符流来复制文件
+		案例：利用带有自定义缓冲的流来复制文件提高效率
+	3.缓冲流
+		java.io.BufferedReader
+			构造方法:
+				BufferedReader(Reader in) 
+				BufferedReader(Reader in, int sz) 
+				将一个Reader传入BufferedReader后 BufferedReader会在原来Reader的基础上增加缓冲区，从而实现高效的读取数据，这个过程中BufferedReader不会改变原有Reader的功能，只是为底层的流提供了缓冲的能力，用来提高读取效率。
+			方法:
+				int read()  
+				int read(char[] cbuf)  
+				int read(char[] cbuf, int off, int len)  
+				String readLine()  	
+				close() 
+
+		java.io.BufferedWriter
+			构造方法:
+				BufferedWriter(Writer out) 
+				BufferedWriter(Writer out, int sz) 
+				将一个Writer传入BufferedWriter后 BufferedWriter会在原来Writer的基础上增加缓冲区，从而实现高效的写出数据，这个过程中BufferedWriter不会改变原有Writer的功能，只是为底层的流提供了缓冲的能力，用来提高写出效率。
+			方法:
+				write(int c)
+				write(String str)
+				write(char[] cbuf)
+				write(char[] cbuf, int off, int len)
+				newLine()  
+	4.装饰设计模式
+		设计模式：前人对编写java代码的套路的总结，java一共有23种通用设计模式。
+		装饰设计模式就起其中的一种。
+		装饰设计模式主要的能力，是通过装饰者包装被装饰者，在被装饰者原有的功能的基础上，增加额外的能力。
+		装饰设计模式实现方式：
+			写一个类 使其具有和被装饰者相同的方法
+			提供构造方法 将被装饰者 传入保存在类的内部
+			对于不想改造的方法直接调用原有对象本来的方法
+			对于想改造的方法 进行改造。
+			对于想增加的方法 直接增加。
+		这样可以将被装饰者传入，装饰，增加特定的功能。	
+
+	5.StringReader
+		数据来源是字符串的字符输入流，可以将一个字符串作为数据来源 以流的方式获取其中的数据
+
+三、字节流
+	1.InputStream - FileInputStream
+		以字节为基本单位来操作数据
+		构造方法：
+			FileInputStream(File file) 
+			FileInputStream(String name)
+		方法：
+			int read()
+			int read(byte[] b) 
+			int read(byte[] b, int off, int len)  
+			int available() 
+			void close()  
+		案例：以字节为单位从文件中读取数据
+		
+	2.OutputStream - FileOutputStream
+		以字节为基本单位来操作数据
+		构造方法：
+			FileOutputStream(File file) 
+			FileOutputStream(String name) 
+		方法：
+			void write(int b) 
+			void write(byte[] b) 
+			void write(byte[] b, int off, int len) 
+			void flush()
+			void close() 
+
+		案例：以字节为单位向文件写出数据
+
+		案例：利用字节流实现文件的拷贝 文本文件 和 非文本文件都可以拷贝
+
+		案例：利用字节流实现文件的拷贝 - 自定义缓冲区提升性能
+
+	3.转换流
+		字符流的底层也是通过字节来操作数据的 只不过在字节流的基础上增加了 默认的转换器 可以经字节和字符进行映射 采用的编码集为系统码 且无法更改
+		所以当使用字符流 操作 非系统码的文件时 可能产生乱码
+		此时可以通过转换流 将自己构建的字节流 转换为字符流 并在这个过程中 指定需要的编码集 来解决问题
+		
+		InputStreamReader - 可以将字节输入流转换为字符输入流 在转换的过程中 其实内部就是多了一个将字节 映射为 字符的操作 而采用的编码集 可以由程序来指定
+			构造方法：
+				InputStreamReader(InputStream in) //将字节输入流转换为字符输入流 内部增加的转换器 采用默认的码表(系统码)
+				InputStreamReader(InputStream in, String charsetName)  //将字节输入流转换为字符输入流 内部增加的转换器 采用的码表由charsetName来指定
+
+			方法：
+				int read() 
+				int read(char[] cbuf)  
+				int read(char[] cbuf, int offset, int length) 
+				void close()  
+
+		OutputStreamWriter - 可以将字节输出流转换wie字符输出流 在转换的过程中 其实内部就是多了一个将字符 映射为 字节的操作 而采用的编码集 可以由程序来指定
+			构造方法：
+				OutputStreamWriter(OutputStream out)//将字节输出流转换为字符输出流 内部增加的转换器 采用默认的码表(系统码)
+				OutputStreamWriter(OutputStream out, String charsetName) //将字节输出流转换为字符输出流 内部增加的转换器 采用的码表由charsetName来指定
+
+			方法：
+				void write(int c)  
+				void write(char[] cbuf)  
+				void write(char[] cbuf, int off, int len)  
+				void write(String str)
+
+		案例5：利用转换流实现utf-8编码集的文本文件的拷贝	
+		案例6(作业)：请写程序将gbk的文本文件转换为utf-8的文本文件 实现一个转码的过程
+		案例7(作业)：请写程序将utf-8的文本文件转换为gbk的文本文件 实现一个转码的过程
+
+	4.系统流
+		System是java内置的代表当前系统的类 其上提供了很多和系统相关的属性和方法 方便我们对系统进行操作
+		常用的属性：
+			static InputStream in - 标准输入流
+			static PrintStream out - 标准输出流 
+			static PrintStream err - 标准错误输出流
+		常用的方法：	
+			static void exit(int status)  //退出虚拟机
+			static void gc() //启动垃圾回收 虚拟机通常会根据自身的内存使用情况 自动决定什么时候来进行垃圾回收 但是也可以通过这个方法 通知虚拟机该垃圾回收 但是注意 这个方法调用并不会触发垃圾回收 只是一个通知告诉虚拟机该回收垃圾了 至于是否启动垃圾回收 仍然由虚拟机自己决定
+			static void setIn(InputStream in) //设定系统标准输入流
+			static void setOut(PrintStream out) //设定系统标准输出流  
+			static void setErr(PrintStream err) //设定系统标准错误输出流
+ 
+		其中System上提供的 in out err三个字节流 称之为系统流
+		系统流其实也是字节流 只不过这个字节流不需要我们自己创建 是系统创建好 直接提供给我们用的 不要关 也不能关
+		其中 in 是系统输入流 从系统标准输入流中获取数据 默认的系统标准输入流的来源 是控制台
+		其中 out err 是系统输出流 向系统标准输出流中写出数据 默认的系统标准输出流的目的地 是控制台
+
+		所以，平常大家写的 System.out.println("hello world~"); 起始就是通过System.out得到的了系统输出流 向这个流中 通过println方法写出了 数据 最终去往了控制台显示
+		也可以用 System.err.println("xxx") 写出数据 和 System.out 唯一的不同是 打印出来将会是红色的文本 更加醒目 通常用来打印错误信息 平常大家见到的异常信息 就是通过System.err打印的
+		系统输出流的默认位置是控制台 也可以通过System.setOut() 或System.setErr() 方法修改out或err指向的 系统输出流
+
+		而 其中的System.in代表标准输入流 默认数据来源是控制台 所以可以利用它从控制台中读取数据
+		所以平常从控制态中读取数据可以写成：
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))
+			简单写法
+			Scanner scanner = new Scanner(System.in)
+		系统标准输入流默认的位置是控制台 也可以通过System.setIn() 方法来修改系统默认输入流 从而从其他位置读取数据
+
+	5.打印流
+		采用了装饰设计模式 为普通输出流 增加打印功能
+		
+		PrintStream
+			可以讲普通的字节流转换为打印字节流 这也是一个装饰设计模式 增加了打印的机制 有如下的三个好处
+				打印流增加了打印各种类型数据的方法，省去了将各种类型的数据转换为字节再输出的过程。
+				打印流会自动刷新流，不需要手动进行flush。	
+				打印流永远不抛异常，它的内部自动解决异常。
+
+		PrintWriter
+			可以将普通的字符流转换为打印字符流 这也是一个装饰设计模式 增加了打印的机制 有如下的三个好处
+				打印流增加了打印各种类型数据的方法，省去了将各种类型的数据转换为字符再输出的过程。
+				打印流会自动刷新流，不需要手动进行flush。	
+				打印流永远不抛异常，它的内部自动解决异常。
+
+
+
+	

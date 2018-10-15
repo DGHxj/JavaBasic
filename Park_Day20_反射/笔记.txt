@@ -1,0 +1,115 @@
+一、反射
+	剖析类 得到类内部信息 来实现特定功能
+
+	反射的核心是代表类的字节码的类 Class类
+
+	通过获取指定类的Class信息 剖析该类 具有的属性 方法 构造方法 等等信息 这个过程就是反射的过程。
+
+	1.Class类
+		获取指定类的Class
+			类名.class
+				当只有类的时用这个方法
+			类的对象.getClass()
+				当具有类的对象时用这个方法
+			Class.forName("类的全路径名称")
+				当既没有类也没有对象，只直到类的全路径名称的时候调用这个方法
+				这个方法将会到内存中检查是否存在该类的字节码 如果存在 则直接返回代表该类的字节码的Class对象
+				如果不存在 则先加载类到内存 返回该类的字节码的Class对象
+				所以，这个方法也是最简单的加载类的方法，当需要明确的加载某个类到内存时，可以调用这个方法
+			
+				*由于一个类的字节码在内存中只有一份，而在虚拟机中会有一个Class对象代表这段字节码，所以在一个程序中，对于同一个类获取多次Class得到的将是同一个对象	
+
+		Class中提供的方法
+			通用信息
+				T cast(Object obj)  //进行强制类型转换的方法
+				Class<?>[] getInterfaces() //获取这个类实现过的所有的接口
+				String getName()  //获取Class代表的字节码的类或接口的全路径名称
+				String getSimpleName()  //获取Class代表的字节码的类或接口的简单名称(不带包名的类名)
+				Package getPackage()  //获取Class代表的类或接口的包信息
+				Class<? super T> getSuperclass()  //获取Class代表的类或接口的超类(父类)
+				boolean isInterface()  //判断当前Class是否是一个接口
+				boolean isEnum() //判断当前Class是否是一个枚举类
+				T newInstance() //创建本类的一个对象 这个方法的调用有一个前提条件 这个类必须有共有的无参构造函数
+ 
+			构造方法信息
+				Constructor<?>[] getConstructors()  
+				Constructor<T> getConstructor(Class<?>... parameterTypes)  
+
+				Constructor	
+					方法：
+						String getName() //获取构造方法的名字
+						Class<?>[] getParameterTypes() //获取构造方法参数们的类型  
+						T newInstance(Object... initargs) 
+
+				**在java中想要创建对象几种方式？
+					方式一：new对象
+					方式二：clz.newInstance() //必须有无参构造才可以使用
+					方式三： c = cz.getgetConstructor;c.newInstance(xxx) 
+ 				
+			方法信息
+				Method[] getMethods()  //获取类中的所有方法
+				Method getMethod(String name, Class<?>... parameterTypes)  
+
+				Method方法
+					String getName()  //获取方法名
+					Class<?>[] getParameterTypes()  //获取方法的参数类型
+					Class<?> getReturnType()  //获取方法的返回值类型
+					Object invoke(Object obj, Object... args) //在传入的对象上 应用传入的参数 执行当前方法
+					
+			属性的信息
+				Field[] getFields()  //获取所有属性
+				Field getField(String name)  //获取指定属性
+
+				Field方法
+					String getName()  //获取属性名称
+					Class<?> getType() //获取属性类型
+					Object get(Object obj) //传入一个对象 获取该对象上该属性的值
+					boolean getBoolean(Object obj)  
+					byte getByte(Object obj) 
+					char getChar(Object obj)  
+					double getDouble(Object obj)  
+					float getFloat(Object obj)  
+					int getInt(Object obj)  
+					long getLong(Object obj) 
+					short getShort(Object obj) //传入一个对象 获取该对象上该属性的值 
+					void set(Object obj, Object value)  //传入一个对象 和 一个值 在该对象上将该值设置为 传入的值
+					setBoolean(Object obj, boolean z) 
+					void setByte(Object obj, byte b) 
+					void setChar(Object obj, char c) 
+					void setDouble(Object obj, double d) 
+					void setFloat(Object obj, float f) 
+					void setInt(Object obj, int i) 
+					void setLong(Object obj, long l) 
+					void setShort(Object obj, short s) //传入一个对象 和 一个值 在该对象上将该值设置为 传入的值
+
+			操作私有和保护成员
+				Constructor<?>[] getDeclaredConstructors()  
+				Constructor<T> getDeclaredConstructor(Class<?>... parameterTypes)  
+				Method[] getDeclaredMethods()  
+				Method getDeclaredMethod(String name, Class<?>... parameterTypes)  
+				Field[] getDeclaredFields()  
+				Field getDeclaredField(String name)  
+				以上方法可以帮我们获取到私有 保护 默认的成员 但是获取到后 如果访问权限不足 仍然无法使用
+				如果想要让没有访问权限的成员可以被访问 可以调用 setAccessible 设置为true 就可以强行访问 这种方式让我们反射可以访问类中的本来没有访问权限的成员 虽然方便 但是会破坏类的封装的特性 所以在使用时一定要谨慎 充分考虑是否可以承担这样的风险。
+
+	2.反射的用处
+		在正常的代码中是用不上反射技术的，更多的是在 设计框架的过程中 使用反射
+		
+二、代码调试
+	1.junit测试框架
+		@Test //测试方法上标注的注解
+		@Before //标注的方法将在@Test方法执行前执行
+		@After //标注的方法将在@Test方法执行后执行
+		@BeforeClass //在测试类加载后立即执行 -- 必须写在静态方法上
+		@AfterClass //在测试类销毁前立即执行-- 必须写在静态方法上
+
+		注意@Test只能用在 公有的 非静态 无返回值 无参数的方法上
+
+	2.Debug调试模式
+		打断点
+		单步执行
+		单步钻入
+		单步跳出
+		重新执行方法
+		放行断点
+	
